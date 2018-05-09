@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>bootstable</title>
+	<link rel="stylesheet" href="static/js/bootstrap3.3/css/bootstrap.min.css">
+	<script type="text/javascript" src="static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="static/js/bootstable.js"></script>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div id="init_contents"></div>
+		</div>
+	</div>
+</body>
+</html>
+<script type="text/javascript">
+	$(document).ready(function(e){
+		utils_html({
+			url: 'api/getData.php',
+			viewType: 'table',
+			pageSize: 3,
+			columns: [
+				{text: '标题', dataIndex: 'title'},
+				{text: '发布时间', dataIndex: 'created_at'},
+			],
+		}, 'init_contents')
+	})
+</script>
