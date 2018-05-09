@@ -17,6 +17,7 @@ function bootstable(options, domId)
 	var showLoadIng = false;
 	var paging = true;
 	var nextPage, prevpage, rand;
+	var otherData = {};
 	var _self = this;
 	this.init = function() {
 		this.paging = true;
@@ -50,6 +51,15 @@ function bootstable(options, domId)
 
 		this.currentPage = 1;
 		this.rand = this.getRand();
+		this.__create();
+	}
+	
+	this.loadData = function(options) {
+		console.log('传递的参数有:', options);
+		this.otherData = {};
+		for (var p in options) {
+			this.otherData[p] = options[p];
+		}
 		this.__create();
 	}
 
@@ -98,7 +108,17 @@ function bootstable(options, domId)
 			pageSize: this.pageSize,
 			page: this.currentPage,
 			table: this.table,
+			searchParams: {},
 		};
+
+		if(this.otherData) {
+			// for (var key in this.otherData) {
+			// 	requestData[key] = this.otherData[key];
+			// }
+			requestData.searchParams = this.otherData;
+			console.log('搜索请求的参数有：', requestData);	
+			// return;
+		}
 		this._request('POST', requestData, 'json');
 		console.log('this.htmlHeadString:', this.htmlHeadString);
 		console.log('this.htmlBodyString:', this.htmlBodyString);
@@ -140,7 +160,7 @@ function bootstable(options, domId)
 				this.htmlBodyString += '</div>';
 			}
 		}
-		console.log(this.htmlBodyString);
+		// console.log(this.htmlBodyString);
 		// $("#mainbody_" + this.rand).html(this.htmlBodyString);
 
 	}
@@ -256,4 +276,6 @@ function bootstable(options, domId)
 window.utils_html = function(options, domId) {
 	var boot_utils = new bootstable(options, domId);
 	boot_utils.init();
+	
+	return boot_utils;
 }

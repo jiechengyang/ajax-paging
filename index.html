@@ -24,6 +24,15 @@
 <body>
 	<div class="container">
 		<div class="row">
+			<div style="padding-top:20px;">
+				<table width="100%">
+				<tr>
+					<td style="">
+						<input class="form-control" style="width:300px" id="title_search" placeholder="请输入标题">
+						<button class="btn btn-default" " type="button" id="search_btn">搜索</button>
+					</td>
+				</table>
+			</div>
 			<div id="init_contents"></div>
 		</div>
 		<div class="row">
@@ -41,7 +50,7 @@
 </html>
 <script type="text/javascript">
 	$(document).ready(function(e){
-		utils_html({
+		var tableUtils = utils_html({
 			url: 'api/getData.php',
 			viewType: 'table',
 			pageSize: 3,
@@ -51,20 +60,27 @@
 				{text: '发布时间', dataIndex: 'created_at'},
 			],
 		}, 'init_contents');
-		utils_html({
+		
+		$("#search_btn").on('click', function(event) {
+			var title = $("#title_search").val();
+			// alert('title is ' + title);
+			tableUtils.loadData({'title' : title});
+		});
+
+		var ulUtils = utils_html({
 			url: 'api/getData.php',
 			viewType: 'ul',
-			pageSize: 10,
-			paging: false,
+			pageSize: 3,
+			// paging: false,
 			columns: [
 				{text: '标题', dataIndex: 'title'},
 				{text: '发布时间', dataIndex: 'created_at'},
 			],
 		}, 'init_ul_contents');
-		utils_html({
+		var divUtils = utils_html({
 			url: 'api/getData.php',
 			viewType: 'div',
-			pageSize: 10,
+			pageSize: 5,
 			table: 'activity',
 			columns: [
 				{text: '标题', dataIndex: 'title'},

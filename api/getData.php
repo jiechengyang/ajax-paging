@@ -7,9 +7,14 @@
 	$pageSize = isset($_POST['pageSize']) ? $_POST['pageSize'] : 3;
 	$limit = ($page -1) * $pageSize;
 	$table = !isset($_POST['table']) ? 'byt_article' : 'byt_' . $_POST['table'];
-	$sql = "SELECT {$fields} FROM `{$table}` WHERE 1=1 LIMIT {$limit}, $pageSize";
+	$where = '';
+	if(isset($_POST['searchParams']['title'])) {
+		$where .= ' AND title LIKE "%' . $_POST['searchParams']['title'] . '%" ';
+	}
+
+	$sql = "SELECT {$fields} FROM `{$table}` WHERE 1=1 {$where} LIMIT {$limit}, $pageSize";
 	// echo $sql;
-	$countSql = "SELECT count(id) AS count FROM `{$table}` WHERE 1=1";
+	$countSql = "SELECT count(id) AS count FROM `{$table}` WHERE 1=1 {$where}";
 	$rows = $db->getall($sql);
 	if ($rows) {
 		foreach($rows as $key => $row) {
