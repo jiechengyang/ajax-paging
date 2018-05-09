@@ -6,10 +6,19 @@
 	$page = !isset($_POST['page']) ? 1 : $_POST['page'];
 	$pageSize = isset($_POST['pageSize']) ? $_POST['pageSize'] : 3;
 	$limit = ($page -1) * $pageSize;
-	$sql = "SELECT {$fields} FROM `byt_article` WHERE 1=1 LIMIT {$limit}, $pageSize";
+	$table = !isset($_POST['table']) ? 'byt_article' : 'byt_' . $_POST['table'];
+	$sql = "SELECT {$fields} FROM `{$table}` WHERE 1=1 LIMIT {$limit}, $pageSize";
 	// echo $sql;
-	$countSql = "SELECT count(id) AS count FROM `byt_article` WHERE 1=1";
+	$countSql = "SELECT count(id) AS count FROM `{$table}` WHERE 1=1";
 	$rows = $db->getall($sql);
+	if ($rows) {
+		foreach($rows as $key => $row) {
+			$rows[$key]['created_at'] = date('Y-m-d H:i:s', $row['created_at']);
+			if (array_key_exists('cover', $row)) {
+				$rows[$key]['cover'] = 'http://www.platform.com.cn/' . $row['cover'];
+			}
+		}
+	}
 	$countRow = $db->getone($countSql);
 	$data['totalCount'] = is_array($countRow) && array_key_exists('count', $countRow) ? $countRow['count'] : $countRow;
 	$data['currentPage'] = $page;

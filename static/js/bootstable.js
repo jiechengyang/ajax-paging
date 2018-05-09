@@ -15,9 +15,11 @@ function bootstable(options, domId)
 	var countPage = 0;
 	var currentPage = 1;
 	var showLoadIng = false;
+	var paging = true;
 	var nextPage, prevpage, rand;
 	var _self = this;
 	this.init = function() {
+		this.paging = true;
 		for (var p in options) {
 			this[p] = options[p];
 		}
@@ -95,15 +97,17 @@ function bootstable(options, domId)
 			fields: this.fields.substr(0, this.fields.length-1), 
 			pageSize: this.pageSize,
 			page: this.currentPage,
+			table: this.table,
 		};
 		this._request('POST', requestData, 'json');
 		console.log('this.htmlHeadString:', this.htmlHeadString);
 		console.log('this.htmlBodyString:', this.htmlBodyString);
 		console.log('this.htmlFooterString:', this.htmlFooterString);
 		this.htmlString += this.htmlHeadString + this.htmlBodyString + this.htmlFooterString;
-		this.htmlString += '<div id="paging_'+ this.rand +'"></div><div id="ajax_loading_' + this.rand + '"  class="text-center fullscreen" style="position: fixed;z-index: 999;background: #000;text-align: center;opacity: 0.5;top: 0;left: 0;left: 50%;margin-left: -28%;">';
+		this.htmlString += '<div id="paging_'+ this.rand +'"></div><div id="ajax_loading_' + this.rand + '"  class="text-center fullscreen" style="position: absolute;z-index: 999;background: #000;text-align: center;opacity: 0.5;top: 0;left: 0;left: 50%;margin-left: -50%;">';
 		$(this.domObject).html(this.htmlString);
-		this._paging();
+		$(this.domObject).css('position', 'relative');
+		this.paging && this._paging();
 		this.showLoadIng  && this._createLoading();
 	}
 
@@ -122,30 +126,23 @@ function bootstable(options, domId)
 				this.htmlBodyString += '<li>';
 				for (var p in this.columns) {
 					var field = this.columns[p].dataIndex;
-					if (field.indexOf('time') > -1) {
-						this.htmlBodyString += '<div class="pull-right">' + rows[key].field + '</div>';
+					if (field.indexOf('created_at') > -1) {
+						this.htmlBodyString += '<div class="pull-right">' + rows[key][field] + '</div>';
 					} else {
-						this.htmlBodyString += '<a>' + rows[key].field + '</a>';
+						this.htmlBodyString += '<a>' + rows[key][field] + '</a>';
 					}
 				}
 				this.htmlBodyString += '</li>';
 			} else if(this.viewType == 'div') {
-				this.htmlBodyString += '<div>';
-				for (var p in this.columns) {
-					var field = this.columns[p].dataIndex;
-					if (field.indexOf('img') > -1) {
-						this.htmlBodyString += '<div class="media-left"><img class="media-object" src='+ rows[key].field + '></div>';
-					} else {
-						this.htmlBodyString += '<div class="media-body">' + rows[key].field + '</a>';
-					}
-				}
-
+				this.htmlBodyString += '<div class="media">';
+				this.htmlBodyString += '<div class="media-left"><img class="media-object" src='+ rows[key]['cover'] + '></div>';
+				this.htmlBodyString += '<div class="media-body"><h4 class="media-heading" style="color: green;"><b>' + rows[key]['title'] + '</b></h4><div class="media-content" style="text-indent: 2em; height: 80px; overflow: hidden;">' + rows[key]['content'] + '</div></div>';
 				this.htmlBodyString += '</div>';
 			}
 		}
 		console.log(this.htmlBodyString);
 		// $("#mainbody_" + this.rand).html(this.htmlBodyString);
-		$("#data-loading").hide();
+
 	}
 
 	this._paging = function () {
@@ -166,7 +163,7 @@ function bootstable(options, domId)
 		}
 
 		this.pagingString += '<li class="next next_paging_'+ this.rand +'"><a href="javascript:;" data-page="' + this.nextpage + '">下一页</a></li><li class="last last_paging_'+ this.rand +'" ><a href="javascript:;" data-page="' + this.countPage + '">尾页</a></li></ul>';
-		$('#paging_' + this.rand + '').html(this.pagingString);
+		$('#' + domId + ' #paging_' + this.rand + '').html(this.pagingString);
 
 		$('.paging_yema_' + this.rand).bind('click', function(event) {
 			var page = $(this).children('a').data('page') ? $(this).children('a').data('page') : $(this).children('a').attr('data-page');
@@ -206,11 +203,11 @@ function bootstable(options, domId)
 
 	this._createLoading = function() {
 			
-		$("#ajax_loading_" + this.rand).html(this.loadingContent);
+		$(this.domObject).children(" #ajax_loading_" + this.rand).html(this.loadingContent);
 		if (this.loadingContent) {
-			console.log('Loading:', this.loadingContent);
-			$("#ajax_loading_" + this.rand).width($(this.domObject).width() + 20);
-			$("#ajax_loading_" + this.rand).height($(this.domObject).height());
+			// console.log('Loading:', this.loadingContent);
+			$(this.domObject).children(" #ajax_loading_" + this.rand).width($(this.domObject).width() + 20);
+			$(this.domObject).children(" #ajax_loading_" + this.rand).height($(this.domObject).height());
 		}
 
 	}
@@ -241,7 +238,7 @@ function bootstable(options, domId)
             complete: function() {  
             	// _self.loadingContent = '';
             	setTimeout(function() {
-            		$("#ajax_loading_" + _self.rand).fadeOut(); 
+            		$(_self.domObject).children(" #ajax_loading_" + _self.rand).fadeOut(); 
             	}, 200)
             } 
 		})

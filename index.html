@@ -7,11 +7,34 @@
 	<link rel="stylesheet" href="static/js/bootstrap3.3/css/bootstrap.min.css">
 	<script type="text/javascript" src="static/js/jquery.min.js"></script>
 	<script type="text/javascript" src="static/js/bootstable.js"></script>
+	<style type="text/css" media="screen">
+		.breadcrumb{
+		    margin-bottom: 20px;
+		    padding: 8px 15px;
+		    list-style: none;
+		    border-radius: 4px;
+		    background-color: #f5f5f5;		
+		}
+		.media-object {
+		    width: 148px;
+		    height: 128px;
+		}
+	</style>
 </head>
 <body>
 	<div class="container">
 		<div class="row">
 			<div id="init_contents"></div>
+		</div>
+		<div class="row">
+<!-- 			<ul class="breadcrumb">
+				<li>首页</li>
+				<li>咨询列表</li>
+			</ul> -->
+			<div id="init_ul_contents"></div>
+		</div>
+		<div class="row">
+			<div id="init_div_contents"></div>
 		</div>
 	</div>
 </body>
@@ -24,8 +47,31 @@
 			pageSize: 3,
 			columns: [
 				{text: '标题', dataIndex: 'title'},
+				{text: '分类', dataIndex: 'category'},
 				{text: '发布时间', dataIndex: 'created_at'},
 			],
-		}, 'init_contents')
+		}, 'init_contents');
+		utils_html({
+			url: 'api/getData.php',
+			viewType: 'ul',
+			pageSize: 10,
+			paging: false,
+			columns: [
+				{text: '标题', dataIndex: 'title'},
+				{text: '发布时间', dataIndex: 'created_at'},
+			],
+		}, 'init_ul_contents');
+		utils_html({
+			url: 'api/getData.php',
+			viewType: 'div',
+			pageSize: 10,
+			table: 'activity',
+			columns: [
+				{text: '标题', dataIndex: 'title'},
+				{text: '封面', dataIndex: 'cover'},
+				{text: '内容', dataIndex: 'content'},
+				{text: '发布时间', dataIndex: 'created_at'},
+			],
+		}, 'init_div_contents');
 	})
 </script>
