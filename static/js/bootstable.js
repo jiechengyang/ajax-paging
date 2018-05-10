@@ -58,8 +58,12 @@ function bootstable(options, domId)
 		console.log('传递的参数有:', options);
 		this.otherData = {};
 		for (var p in options) {
-			this.otherData[p] = options[p];
+			if(options[p] != '' || options[p] != null || options[p] != undefined) {
+				this.otherData[p] = options[p];
+			}
+			
 		}
+		this.currentPage = 1;
 		this.__create();
 	}
 
@@ -103,6 +107,7 @@ function bootstable(options, domId)
 			var field = this.columns[p].dataIndex;
 			this.fields += field + ',';
 		}
+		
 		var requestData = {
 			fields: this.fields.substr(0, this.fields.length-1), 
 			pageSize: this.pageSize,
@@ -120,9 +125,9 @@ function bootstable(options, domId)
 			// return;
 		}
 		this._request('POST', requestData, 'json');
-		console.log('this.htmlHeadString:', this.htmlHeadString);
-		console.log('this.htmlBodyString:', this.htmlBodyString);
-		console.log('this.htmlFooterString:', this.htmlFooterString);
+		// console.log('this.htmlHeadString:', this.htmlHeadString);
+		// console.log('this.htmlBodyString:', this.htmlBodyString);
+		// console.log('this.htmlFooterString:', this.htmlFooterString);
 		this.htmlString += this.htmlHeadString + this.htmlBodyString + this.htmlFooterString;
 		this.htmlString += '<div id="paging_'+ this.rand +'"></div><div id="ajax_loading_' + this.rand + '"  class="text-center fullscreen" style="position: absolute;z-index: 999;background: #000;text-align: center;opacity: 0.5;top: 0;left: 0;left: 50%;margin-left: -50%;">';
 		$(this.domObject).html(this.htmlString);
@@ -226,8 +231,9 @@ function bootstable(options, domId)
 		$(this.domObject).children(" #ajax_loading_" + this.rand).html(this.loadingContent);
 		if (this.loadingContent) {
 			// console.log('Loading:', this.loadingContent);
-			$(this.domObject).children(" #ajax_loading_" + this.rand).width($(this.domObject).width() + 20);
-			$(this.domObject).children(" #ajax_loading_" + this.rand).height($(this.domObject).height());
+			$(this.domObject).children("#ajax_loading_" + this.rand).width($(this.domObject).width() + 20);
+			$(this.domObject).children("#ajax_loading_" + this.rand).height($(this.domObject).height());
+			$(".data_loading_" + this.rand).children('img').height($(this.domObject).height());
 		}
 
 	}
@@ -252,7 +258,7 @@ function bootstable(options, domId)
 				}
 			},
             beforeSend: function() {
-            	_self.loadingContent = '<div> <img src="static/images/data-loading.gif" style="max-width:100%;line-height:100px" width="100" height="100"/></div>';    
+            	_self.loadingContent = '<div class="data_loading_' + _self.rand + '"><img src="static/images/data-loading.gif" style="max-width:100%;line-height:100px"  height="100"/></div>';    
             	_self._createLoading();
             },   
             complete: function() {  
