@@ -80,8 +80,9 @@
 		var divUtils = utils_html({
 			url: 'api/getData.php',
 			viewType: 'div',
-			pageSize: 5,
+			pageSize: 2,
 			table: 'activity',
+			async: true,
 			columns: [
 				{text: '标题', dataIndex: 'title'},
 				{text: '封面', dataIndex: 'cover'},

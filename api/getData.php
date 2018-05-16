@@ -28,6 +28,6 @@
 	$data['totalCount'] = is_array($countRow) && array_key_exists('count', $countRow) ? $countRow['count'] : $countRow;
 	$data['currentPage'] = $page;
 	$data['rows'] = array_values($rows);
-
+	// sleep(5);
 	echo json_encode($data);
  ?>

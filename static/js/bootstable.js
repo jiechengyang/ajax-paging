@@ -18,6 +18,7 @@ function bootstable(options, domId)
 	var paging = true;
 	var nextPage, prevpage, rand;
 	var otherData = {};
+	var async = false;
 	var _self = this;
 	this.init = function() {
 		this.paging = true;
@@ -48,6 +49,10 @@ function bootstable(options, domId)
 		if (this.fields == undefined) {
 			this.fields = '';
 		}	
+
+		if (this.async == undefined) {
+			this.async = false;
+		}			
 
 		this.currentPage = 1;
 		this.rand = this.getRand();
@@ -96,10 +101,10 @@ function bootstable(options, domId)
 			this.htmlFooterString = '</table>';
 
 		} else if (this.viewType == 'ul') {
-			this.htmlString = '<ul class="post-list">';
+			this.htmlString = '<ul class="post-list" id="mainbody_' + this.rand + '">';
 			this.htmlFooterString = '</ul>';
 		} else if (this.viewType == 'div') {
-			this.htmlString = '<div class="media">';
+			this.htmlString = '<div class="media" id="mainbody_' + this.rand + '">';
 			this.htmlFooterString = '</div>';
 		}
 		
@@ -132,8 +137,10 @@ function bootstable(options, domId)
 		this.htmlString += '<div id="paging_'+ this.rand +'"></div><div id="ajax_loading_' + this.rand + '"  class="text-center fullscreen" style="position: absolute;z-index: 999;background: #000;text-align: center;opacity: 0.5;top: 0;left: 0;left: 50%;margin-left: -50%;">';
 		$(this.domObject).html(this.htmlString);
 		$(this.domObject).css('position', 'relative');
-		this.paging && this._paging();
-		this.showLoadIng  && this._createLoading();
+		if (!this.async) {
+			this.paging && this._paging();
+			this.showLoadIng  && this._createLoading();
+		}
 	}
 
 	this.__createBody = function(rows) {
@@ -166,7 +173,7 @@ function bootstable(options, domId)
 			}
 		}
 		// console.log(this.htmlBodyString);
-		// $("#mainbody_" + this.rand).html(this.htmlBodyString);
+		this.async && $("#mainbody_" + this.rand).html(this.htmlBodyString);
 
 	}
 
@@ -243,10 +250,11 @@ function bootstable(options, domId)
 		dataType = dataType || 'html';
 		jQuery.ajax({
 			type: type,
-			async:false,
+			async: _self.async,
 			data: data,
 			url: this.url,
 			dataType: dataType,
+			timeout: 30000,
 			success: function(da) {
 				// {"totalCount":"3","rows":[{"id":"1","name":"\u5c0f\u5b66","xyears":"6","addtime":"2017-01-15"}]}
 				_self.totalCount = da.totalCount;
@@ -255,17 +263,34 @@ function bootstable(options, domId)
 				console.log('countPage', _self.countPage, _self.currentPage);
 				if (da.totalCount > 0) {
 					_self.__createBody(da.rows);
+					if (_self.async) {
+						_self.paging && _self._paging();
+						_self.showLoadIng  && _self._createLoading();
+					}
 				}
 			},
             beforeSend: function() {
             	_self.loadingContent = '<div class="data_loading_' + _self.rand + '"><img src="static/images/data-loading.gif" style="max-width:100%;line-height:100px"  height="100"/></div>';    
             	_self._createLoading();
             },   
-            complete: function() {  
+            complete: function(XMLHttpRequest, textStatus) {  
             	// _self.loadingContent = '';
+            	console.log('XMLHttpRequest.status', XMLHttpRequest.status);
+            	console.log('XMLHttpRequest.readyState', XMLHttpRequest.readyState);
+            	console.log('textStatus', textStatus);
             	setTimeout(function() {
-            		$(_self.domObject).children(" #ajax_loading_" + _self.rand).fadeOut(); 
+            		if(XMLHttpRequest.status == 200) {
+            			$(_self.domObject).children(" #ajax_loading_" + _self.rand).fadeOut(); 
+            		} else {
+            			$(_self.domObject).children(" #ajax_loading_" + _self.rand).html('请求失败');
+            		}
+            		
             	}, 200)
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                // alert(XMLHttpRequest.status);
+                // alert(XMLHttpRequest.readyState);
+                // alert(textStatus);            	
             } 
 		})
 	}
