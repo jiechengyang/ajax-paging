@@ -6,7 +6,7 @@
 	<title>bootstable</title>
 	<link rel="stylesheet" href="static/js/bootstrap3.3/css/bootstrap.min.css">
 	<script type="text/javascript" src="static/js/jquery.min.js"></script>
-	<script type="text/javascript" src="static/js/bootstable.js"></script>
+	<script type="text/javascript" src="static/js/bootstable.min.js"></script>
 	<style type="text/css" media="screen">
 		.breadcrumb{
 		    margin-bottom: 20px;
@@ -53,7 +53,8 @@
 		var tableUtils = utils_html({
 			url: 'api/getData.php',
 			viewType: 'table',
-			pageSize: 3,
+			pageSize: 2,
+			// otherData:{category_id: 4},
 			columns: [
 				{text: '标题', dataIndex: 'title'},
 				{text: '分类', dataIndex: 'category'},
@@ -81,6 +82,7 @@
 			url: 'api/getData.php',
 			viewType: 'div',
 			pageSize: 2,
+			pagingStyle: 'fall',
 			table: 'activity',
 			async: true,
 			columns: [

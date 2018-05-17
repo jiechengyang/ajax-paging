@@ -11,6 +11,10 @@
 	if(isset($_POST['searchParams']['title'])) {
 		$where .= ' AND title LIKE "%' . $_POST['searchParams']['title'] . '%" ';
 	}
+	
+	if(isset($_POST['searchParams']['category_id'])) {
+		$where .= ' AND category_id = "' . $_POST['searchParams']['category_id'] . '" ';
+	}
 
 	$sql = "SELECT {$fields} FROM `{$table}` WHERE 1=1 {$where} LIMIT {$limit}, $pageSize";
 	// echo $sql;
@@ -28,6 +32,6 @@
 	$data['totalCount'] = is_array($countRow) && array_key_exists('count', $countRow) ? $countRow['count'] : $countRow;
 	$data['currentPage'] = $page;
 	$data['rows'] = array_values($rows);
-	// sleep(5);
+	// sleep(15);
 	echo json_encode($data);
  ?>
