@@ -8,11 +8,11 @@
 	$limit = ($page -1) * $pageSize;
 	$table = !isset($_POST['table']) ? 'byt_article' : 'byt_' . $_POST['table'];
 	$where = '';
-	if(isset($_POST['searchParams']['title'])) {
+	if (isset($_POST['searchParams']['title'])) {
 		$where .= ' AND title LIKE "%' . $_POST['searchParams']['title'] . '%" ';
 	}
 	
-	if(isset($_POST['searchParams']['category_id'])) {
+	if (isset($_POST['searchParams']['category_id'])) {
 		$where .= ' AND category_id = "' . $_POST['searchParams']['category_id'] . '" ';
 	}
 

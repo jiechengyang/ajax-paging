@@ -76,6 +76,10 @@ function bootstable(options, domId)
 			this.otherData = {};
 		}
 
+		if (this.filter == undefined) {
+			this.filter = false;
+		}
+
 		this.currentPage = 1;
 		this.rand = this.getRand();
 		// this.__create();
@@ -180,9 +184,19 @@ function bootstable(options, domId)
 				}
 				this.htmlBodyString += '</li>';
 			} else if(this.viewType == 'div') {
+				var defaultShowKeys = [];
+				for (var p in this.columns) {
+					if (this.columns[p].hasOwnProperty('show') && this.columns[p].show) {
+						defaultShowKeys.push(this.columns[p].dataIndex);
+					}
+				}
+				if (!defaultShowKeys) {
+					defaultShowKeys = ['title', 'content'];
+				}
+				
 				this.htmlBodyString += '<div class="media">';
 				this.htmlBodyString += '<div class="media-left"><img class="media-object" src='+ rows[key]['cover'] + '></div>';
-				this.htmlBodyString += '<div class="media-body"><h4 class="media-heading" style="color: green;"><b>' + rows[key]['title'] + '</b></h4><div class="media-content" style="text-indent: 2em; height: 80px; overflow: hidden;">' + rows[key]['content'] + '</div></div>';
+				this.htmlBodyString += '<div class="media-body"><h4 class="media-heading" style="color: green;"><b>' + rows[key][defaultShowKeys[0]] + '</b></h4><div class="media-content" style="text-indent: 2em; height: 80px; overflow: hidden;">' + rows[key][defaultShowKeys[1]] + '</div></div>';
 				this.htmlBodyString += '</div>';
 			}
 		}
@@ -197,7 +211,7 @@ function bootstable(options, domId)
 		var lastpaging = '';
 		this.prevpage = this.currentPage == 1 ? 1 : this.currentPage - 1;
 		this.nextpage = this.currentPage == this.countPage ? this.countPage : parseInt(this.currentPage) + 1;
-		if(this.pagingStyle == 'base') {
+		if ( 'base' === this.pagingStyle ) {
 			if (this.currentPage == 1) {
 				firstpaging = '<li class="first disabled"><span>首页</span></li><li class="prev disabled"><span>上一页</span></li>';
 			} else {
@@ -214,30 +228,34 @@ function bootstable(options, domId)
 				var active = this.currentPage == i ? 'active' : '';
 				this.pagingString += '<li class="paging_yema_' + this.rand + ' ' + active + '"><a href="javascript:;" data-page="' + i + '">' + i + '</a></li>';
 			}
-		} else {
+		} else if ( 'fall' === this.pagingStyle ) {
 			var i = 1;
-			var defaultShowPageNumber = this.defaultShowPageNumber;
+			var defaultShowPageNumber = this.countPage > this.defaultShowPageNumber ? this.defaultShowPageNumber : this.currentPage;
 			var step = this.step;
-			if(this.currentPage > 1) {
+			if (this.currentPage > 1) {
 				firstpaging = '<li class="prev prev_paging_'+ this.rand +'"><a href="javascript:;" data-page="' + this.prevpage + '">上一页</a></li>';
 			}
 
-			if(this.currentPage + step > defaultShowPageNumber) {
+			if (this.currentPage + step > defaultShowPageNumber) {
 				var factive = this.currentPage == 1 ? 'active' : '';
-				firstpaging = '<li class="prev prev_paging_'+ this.rand +'"><a href="javascript:;" data-page="' + this.prevpage + '">上一页</a></li><li class="paging_yema_' + this.rand + ' ' + factive + '"><a href="javascript:;" data-page="1">1</a></li><li><span>...</span></li>';
-				if((this.countPage - this.currentPage) < step) {
+				firstpaging = '<li class="paging_yema_' + this.rand + ' ' + factive + '"><a href="javascript:;" data-page="1">1</a></li>';
+				if ( (this.countPage - this.currentPage) < step) {
 					step = this.countPage - this.currentPage;
-					i = this.currentPage - this.defaultShowPageNumber + this.step;
+					i = this.currentPage - defaultShowPageNumber + this.step;
 					console.log('step is:%d', step);
 				} else {
 					i = this.currentPage - step;
+					firstpaging = '<li class="prev prev_paging_'+ this.rand +'"><a href="javascript:;" data-page="' + this.prevpage + '">上一页</a></li>' + firstpaging + '<li><span>...</span></li>';
 
 				}
 
 				defaultShowPageNumber = this.currentPage + step;
 			} 
 
-			for(i; i <= defaultShowPageNumber; i++) {
+			console.log('i:%d,step:%d,defaultShowPageNumber:%d, this.currentPage + step:%d', i, step, defaultShowPageNumber, this.currentPage + step);
+			console.log('this.currentPage:', this.currentPage);
+			console.log('this.countPage:', this.countPage);
+			for (i; i <= defaultShowPageNumber; i++) {
 				var active = this.currentPage == i ? 'active' : '';
 				this.pagingString += '<li class="paging_yema_' + this.rand + ' ' + active + '"><a href="javascript:;" data-page="' + i + '">' + i + '</a></li>';			
 			}
@@ -309,7 +327,7 @@ function bootstable(options, domId)
 			data: data,
 			url: this.url,
 			dataType: dataType,
-			timeout: 10000,
+			timeout: 30000,
 			success: function(da) {
 				// {"totalCount":"3","rows":[{"id":"1","name":"\u5c0f\u5b66","xyears":"6","addtime":"2017-01-15"}]}
 				_self.totalCount = da.totalCount;
